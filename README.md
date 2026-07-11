@@ -1,4 +1,3 @@
-```markdown
 # Sous le capot de l'IA
 
 Dépôt officiel accompagnant le livre **Sous le capot de l'IA**.
@@ -55,4 +54,3 @@ Le code source de ce dépôt est distribué sous la licence **MIT**.
 Le texte du livre, les illustrations, les schémas et le contenu pédagogique ne sont **pas** couverts par cette licence et restent protégés par le droit d'auteur.
 
 © Serge Bollaerts – Tous droits réservés pour le contenu du livre.
-```
