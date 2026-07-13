@@ -1,0 +1,58 @@
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# General build and temp artifacts
+bin/
+obj/
+dist/
+build/
+out/
+tmp/
+temp/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.nox/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Packaging
+.eggs/
+*.egg-info/
+pip-wheel-metadata/
+
+# .NET / C#
+*.user
+*.rsuser
+*.suo
+*.cache
+*.pdb
+*.mdb
+TestResults/
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# Tooling caches
+.vs/
