@@ -223,3 +223,54 @@ des sources réelles.
 - **Repartir proprement** : le dossier `depart/` du dépôt GitHub reste disponible
   pour recommencer l'exercice à zéro, ou pour démarrer directement le labo 2 sur
   une base saine.
+
+---
+
+## Commandes pratiques
+
+Aide-mémoire des commandes utiles pendant le labo.
+
+### Ollama
+
+```bash
+ollama serve                 # démarrer le serveur Ollama (souvent déjà lancé)
+ollama pull mistral          # télécharger le modèle (une seule fois)
+ollama list                  # lister les modèles installés localement
+ollama run mistral           # tester le modèle directement en ligne de commande
+ollama ps                    # voir les modèles actuellement chargés en mémoire
+```
+
+Par défaut, Ollama écoute sur `http://localhost:11434`. Vérifier qu'il répond :
+
+```bash
+curl http://localhost:11434/api/tags
+```
+
+### Python (Streamlit)
+
+```bash
+cd code/labo-01-chatbot/python/solution   # ou .../depart
+
+python -m venv .venv                       # créer l'environnement virtuel
+source .venv/bin/activate                  # Windows : .venv\Scripts\activate
+deactivate                                 # sortir de l'environnement virtuel
+
+pip install -r requirements.txt            # installer les dépendances
+streamlit run app.py                       # lancer l'application
+streamlit run app.py --server.port 8502    # lancer sur un autre port
+```
+
+Arrêter l'application : `Ctrl+C` dans le terminal.
+
+### .NET (Blazor Server)
+
+```bash
+cd code/labo-01-chatbot/dotnet/solution/AssistantBikaroo   # ou .../depart/...
+
+dotnet restore                             # restaurer les paquets NuGet
+dotnet build                               # compiler
+dotnet run                                 # lancer l'application
+dotnet watch run                           # lancer avec rechargement à chaud
+```
+
+Arrêter l'application : `Ctrl+C` dans le terminal.
