@@ -56,3 +56,4 @@ packages/
 
 # Tooling caches
 .vs/
+tree.txt
