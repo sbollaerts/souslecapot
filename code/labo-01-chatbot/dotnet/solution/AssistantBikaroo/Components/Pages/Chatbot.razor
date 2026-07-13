@@ -1,0 +1,190 @@
+@page "/"
+@rendermode InteractiveServer
+@using System.Diagnostics
+@using System.Text
+@using OllamaSharp
+@using OllamaSharp.Models
+@using OllamaSharp.Models.Chat
+@inject OllamaApiClient Ollama
+
+<PageTitle>Assistant Bikaroo — Labo 1</PageTitle>
+
+<div style="display:flex; gap:2rem; max-width:1100px; margin:1rem auto; font-family:sans-serif;">
+
+    @* --- Colonne configuration : prompt système et paramètres de génération --- *@
+    <aside style="width:320px; flex-shrink:0;">
+        <h2>Configuration</h2>
+
+        <label><strong>Prompt système</strong></label>
+        <textarea @bind="systemPrompt" rows="8" style="width:100%;"></textarea>
+
+        <h3>Paramètres de génération</h3>
+
+        <label>Température : @temperature.ToString("0.0")</label>
+        <input type="range" min="0" max="1" step="0.1" @bind="temperature" style="width:100%;" />
+
+        <label>Nombre maximum de tokens en sortie : @maxTokens</label>
+        <input type="range" min="64" max="2048" step="64" @bind="maxTokens" style="width:100%;" />
+
+        <button @onclick="ClearConversation" style="margin-top:1rem;">Effacer la conversation</button>
+    </aside>
+
+    @* --- Colonne conversation --- *@
+    <main style="flex-grow:1;">
+        <h1>🚲 Assistant Bikaroo</h1>
+        <p><em>Labo 1 — Chatbot local (Ollama · modèle « @Model »)</em></p>
+
+        <div style="border:1px solid #ccc; padding:1rem; min-height:200px; margin-bottom:1rem;">
+            @if (messages.Count == 0)
+            {
+                <p style="color:#888;">La conversation est vide. Posez une question ci-dessous.</p>
+            }
+            @foreach (var message in messages)
+            {
+                <p><strong>@(message.Role == "user" ? "Vous" : "Assistant") :</strong> @message.Content</p>
+            }
+        </div>
+
+        @if (errorMessage is not null)
+        {
+            <p style="color:#b00020;">@errorMessage</p>
+        }
+
+        <div style="display:flex; gap:0.5rem;">
+            <input @bind="userInput" @bind:event="oninput" @onkeydown="OnKeyDown"
+                   placeholder="Posez votre question…" style="flex-grow:1;" disabled="@isGenerating" />
+            <button @onclick="SendAsync" disabled="@(isGenerating || string.IsNullOrWhiteSpace(userInput))">
+                @(isGenerating ? "…" : "Envoyer")
+            </button>
+        </div>
+
+        @* --- Informations techniques sur le dernier appel ---
+             Volontairement simples pour ce labo : un simple dictionnaire clé/valeur,
+             facile à enrichir dans les labos suivants (chunks retrouvés, tools, etc.). *@
+        @if (lastCallInfo is not null)
+        {
+            <details open style="margin-top:1rem;">
+                <summary>Informations techniques sur le dernier appel</summary>
+                <ul>
+                    @foreach (var item in lastCallInfo)
+                    {
+                        <li><strong>@item.Key :</strong> @item.Value</li>
+                    }
+                </ul>
+            </details>
+        }
+    </main>
+</div>
+
+@code {
+    // Modèle fixé pour ce labo (bonnes performances en français).
+    private const string Model = "mistral";
+
+    // Prompt système par défaut : il positionne l'assistant, mais ne lui donne
+    // volontairement aucune connaissance des documents internes de Bikaroo.
+    // (Cette connaissance documentaire sera introduite au labo 2, avec le RAG.)
+    private string systemPrompt =
+        "Tu es l'Assistant Bikaroo, l'assistant virtuel de Bikaroo, une société "
+        + "de vélos partagés à Bruxelles. Tu réponds toujours en français, de "
+        + "manière claire, polie et concise.";
+
+    private double temperature = 0.7;
+    private int maxTokens = 512;
+
+    private string userInput = string.Empty;
+    private bool isGenerating;
+    private string? errorMessage;
+
+    // Historique de la conversation (utilisateur / assistant), dans l'ordre chronologique.
+    private readonly List<ChatMessage> messages = new();
+    private Dictionary<string, string>? lastCallInfo;
+
+    private record ChatMessage(string Role, string Content);
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendAsync();
+        }
+    }
+
+    private async Task SendAsync()
+    {
+        if (string.IsNullOrWhiteSpace(userInput) || isGenerating)
+        {
+            return;
+        }
+
+        errorMessage = null;
+        messages.Add(new ChatMessage("user", userInput));
+        userInput = string.Empty;
+        isGenerating = true;
+
+        try
+        {
+            // On reconstruit à chaque appel la liste complète des messages :
+            // le prompt système d'abord, puis tout l'historique de la conversation.
+            var chatMessages = new List<Message>
+            {
+                new() { Role = ChatRole.System, Content = systemPrompt },
+            };
+            foreach (var message in messages)
+            {
+                chatMessages.Add(new Message
+                {
+                    Role = message.Role == "user" ? ChatRole.User : ChatRole.Assistant,
+                    Content = message.Content,
+                });
+            }
+
+            var request = new ChatRequest
+            {
+                Model = Model,
+                Stream = false,
+                Messages = chatMessages,
+                Options = new RequestOptions
+                {
+                    Temperature = (float)temperature,
+                    NumPredict = maxTokens, // nombre maximum de tokens générés en sortie
+                },
+            };
+
+            var stopwatch = Stopwatch.StartNew();
+            var answer = new StringBuilder();
+            await foreach (var chunk in Ollama.ChatAsync(request))
+            {
+                answer.Append(chunk?.Message?.Content ?? string.Empty);
+            }
+            stopwatch.Stop();
+
+            messages.Add(new ChatMessage("assistant", answer.ToString()));
+            lastCallInfo = new Dictionary<string, string>
+            {
+                ["Modèle"] = Model,
+                ["Température"] = temperature.ToString("0.0"),
+                ["Max tokens"] = maxTokens.ToString(),
+                ["Durée de génération"] = $"{stopwatch.Elapsed.TotalSeconds:0.00} s",
+            };
+        }
+        catch (Exception ex)
+        {
+            errorMessage =
+                $"Impossible de contacter Ollama. Vérifiez qu'Ollama est bien lancé "
+                + $"et que le modèle « {Model} » est téléchargé (commande : ollama pull {Model}). "
+                + $"Détail technique : {ex.Message}";
+        }
+        finally
+        {
+            isGenerating = false;
+        }
+    }
+
+    private void ClearConversation()
+    {
+        // Vide la conversation mais conserve le prompt système et les paramètres.
+        messages.Clear();
+        lastCallInfo = null;
+        errorMessage = null;
+    }
+}
