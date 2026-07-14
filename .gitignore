@@ -57,3 +57,7 @@ packages/
 # Tooling caches
 .vs/
 tree.txt
+
+# Index RAG généré (labo 2) — reconstruit au démarrage à partir du corpus
+bikaroo_rag.db
+*.db
