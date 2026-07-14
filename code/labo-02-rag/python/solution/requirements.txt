@@ -1,0 +1,4 @@
+streamlit>=1.30
+ollama>=0.3
+# sqlite3 fait partie de la bibliothèque standard de Python : aucune dépendance
+# supplémentaire n'est nécessaire pour le stockage vectoriel de ce labo.
