@@ -17,6 +17,11 @@ import rag
 # Modèle de génération (identique au labo 1).
 MODEL = "mistral"
 
+# Emplacements : c'est l'application qui décide où lire le corpus et où écrire
+# l'index ; le module rag les reçoit en paramètre.
+# app.py est dans .../python/depart/ ; le corpus dans .../ressources/.
+CORPUS_DIR = Path(__file__).resolve().parents[2] / "ressources"
+
 # Base SQLite de l'index vectoriel (mise en cache à côté de l'application).
 DB_PATH = Path(__file__).resolve().parent / "bikaroo_rag.db"
 
@@ -46,7 +51,7 @@ if "last_sources" not in st.session_state:
 # Tant que rag.ensure_index() n'est pas implémenté, index_size vaudra 0.
 if "index_size" not in st.session_state:
     with st.spinner("Indexation du corpus documentaire…"):
-        st.session_state.index_size = rag.ensure_index(DB_PATH)
+        st.session_state.index_size = rag.ensure_index(DB_PATH, CORPUS_DIR)
 
 
 def call_ollama(system_prompt, context, history, temperature, max_tokens):

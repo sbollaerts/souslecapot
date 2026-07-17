@@ -18,6 +18,11 @@ import rag
 # Modèle de génération (identique au labo 1).
 MODEL = "mistral"
 
+# Emplacements : c'est l'application qui décide où lire le corpus et où écrire
+# l'index ; le module rag les reçoit en paramètre.
+# app.py est dans .../python/solution/ ; le corpus dans .../ressources/.
+CORPUS_DIR = Path(__file__).resolve().parents[2] / "ressources"
+
 # Base SQLite de l'index vectoriel (mise en cache à côté de l'application).
 DB_PATH = Path(__file__).resolve().parent / "bikaroo_rag.db"
 
@@ -50,13 +55,13 @@ if "last_sources" not in st.session_state:
 if "index_size" not in st.session_state:
     try:
         with st.spinner("Indexation du corpus documentaire…"):
-            st.session_state.index_size = rag.ensure_index(DB_PATH)
+            st.session_state.index_size = rag.ensure_index(DB_PATH, CORPUS_DIR)
     except Exception as error:  # noqa: BLE001
         st.error(
             "Impossible d'indexer le corpus. Vérifiez qu'Ollama est lancé et que "
             f"le modèle d'embeddings « {rag.EMBEDDING_MODEL} » est téléchargé "
             f"(commande : `ollama pull {rag.EMBEDDING_MODEL}`), et que le dossier "
-            f"« {rag.CORPUS_DIR} » existe.\n\nDétail technique : {error}"
+            f"« {CORPUS_DIR} » existe.\n\nDétail technique : {error}"
         )
         st.stop()
 

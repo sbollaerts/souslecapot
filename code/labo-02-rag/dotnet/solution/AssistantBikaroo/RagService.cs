@@ -24,14 +24,15 @@ public class RagService
 
     public int IndexSize { get; private set; }
 
-    public RagService(OllamaApiClient ollama, string contentRootPath)
+    /// <param name="corpusDir">Dossier contenant les documents Markdown du corpus.</param>
+    /// <param name="dbPath">Fichier SQLite où mettre en cache l'index vectoriel.</param>
+    public RagService(OllamaApiClient ollama, string corpusDir, string dbPath)
     {
+        // Les emplacements sont décidés par l'application (voir Program.cs) :
+        // le service RAG ne fait que les recevoir.
         _ollama = ollama;
-        // Le corpus est partagé : .../labo-02-rag/ressources/, trois niveaux
-        // au-dessus du dossier du projet (.../dotnet/solution/AssistantBikaroo/).
-        _corpusDir = Path.GetFullPath(Path.Combine(contentRootPath, "..", "..", "..", "ressources"));
-        // L'index SQLite est mis en cache à côté de l'application.
-        _dbPath = Path.Combine(contentRootPath, "bikaroo_rag.db");
+        _corpusDir = corpusDir;
+        _dbPath = dbPath;
     }
 
     // --- 1. Découpage du corpus en chunks ------------------------------------

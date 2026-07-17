@@ -11,9 +11,17 @@ builder.Services.AddRazorComponents()
 // Client Ollama partagé (génération + embeddings), pointant vers l'instance locale.
 builder.Services.AddSingleton(new OllamaApiClient(new Uri("http://localhost:11434")));
 
+// Emplacements : c'est l'application qui décide où lire le corpus et où écrire
+// l'index ; le service RAG les reçoit en paramètre.
+// Le projet est dans .../dotnet/depart/AssistantBikaroo/ ; le corpus est
+// partagé, trois niveaux au-dessus, dans .../labo-02-rag/ressources/.
+var contentRoot = builder.Environment.ContentRootPath;
+var corpusDir = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "..", "ressources"));
+var dbPath = Path.Combine(contentRoot, "bikaroo_rag.db");
+
 // Service RAG : chunking, embeddings, index SQLite et recherche sémantique.
 builder.Services.AddSingleton(sp =>
-    new RagService(sp.GetRequiredService<OllamaApiClient>(), builder.Environment.ContentRootPath));
+    new RagService(sp.GetRequiredService<OllamaApiClient>(), corpusDir, dbPath));
 
 var app = builder.Build();
 

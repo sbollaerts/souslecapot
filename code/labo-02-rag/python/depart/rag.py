@@ -1,8 +1,9 @@
 """Chaîne RAG de l'Assistant Bikaroo — Labo 2 (squelette de départ).
 
-La plomberie est en place : accès au corpus (CORPUS_DIR), modèle d'embeddings
-et fonction embed_text() déjà câblée sur Ollama. À vous d'implémenter le cœur du
-RAG en suivant les « TODO » :
+La plomberie est en place : le modèle d'embeddings et la fonction embed_text()
+sont déjà câblés sur Ollama. Le dossier du corpus et le chemin de la base sont
+passés en paramètre par l'application (voir app.py). À vous d'implémenter le
+cœur du RAG en suivant les « TODO » :
 
     documents Markdown → chunks → embeddings → index SQLite → recherche cosinus
 """
@@ -15,18 +16,19 @@ import ollama
 # Modèle d'embeddings (multilingue, bonnes performances en français).
 EMBEDDING_MODEL = "bge-m3"
 
-# Dossier du corpus documentaire, partagé par les deux implémentations.
-# rag.py est dans .../python/depart/ ; le corpus dans .../ressources/.
-CORPUS_DIR = Path(__file__).resolve().parents[2] / "ressources"
+# Le dossier du corpus et le chemin de la base ne sont pas définis ici : ce sont
+# des décisions de l'application, qui les passe en paramètre (voir app.py).
 
 
 # --- 1. Découpage du corpus en chunks ----------------------------------------
 
-def load_chunks():
+def load_chunks(corpus_dir):
     """Charge les documents 01→06 du corpus et les découpe en chunks.
 
+    corpus_dir : dossier contenant les documents Markdown du corpus.
+
     TODO (étape 1) :
-      * parcourir CORPUS_DIR.glob("0*.md") (ne sélectionne que 01→06) ;
+      * parcourir Path(corpus_dir).glob("0*.md") (ne sélectionne que 01→06) ;
       * pour chaque fichier, retirer l'éventuel bloc de métadonnées YAML en tête
         (délimité par des lignes « --- ») ;
       * découper le corps sur les titres de section « ## » (le corpus est déjà
@@ -50,11 +52,11 @@ def embed_text(text):
 
 # --- 3. Indexation SQLite ----------------------------------------------------
 
-def build_index(db_path):
+def build_index(db_path, corpus_dir):
     """(Re)construit l'index SQLite à partir du corpus. Renvoie le nb de chunks.
 
     TODO (étape 3) :
-      * appeler load_chunks() ;
+      * appeler load_chunks(corpus_dir) ;
       * créer une table SQLite « chunks » (document, heading, content, embedding) ;
       * pour chaque chunk, calculer embed_text(chunk["content"]) et l'insérer
         (par ex. l'embedding sérialisé en JSON) ;
@@ -64,11 +66,12 @@ def build_index(db_path):
     return 0
 
 
-def ensure_index(db_path):
+def ensure_index(db_path, corpus_dir):
     """Construit l'index seulement s'il est absent. Renvoie le nb de chunks.
 
     TODO (étape 3) : vérifier si la table « chunks » existe et contient des
-    lignes ; si oui renvoyer le nombre de lignes, sinon appeler build_index().
+    lignes ; si oui renvoyer le nombre de lignes, sinon appeler
+    build_index(db_path, corpus_dir).
     """
     # TODO : à implémenter (pour l'instant : aucun index construit)
     return 0

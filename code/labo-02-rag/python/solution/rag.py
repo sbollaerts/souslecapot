@@ -20,9 +20,8 @@ import ollama
 # Modèle d'embeddings (multilingue, bonnes performances en français).
 EMBEDDING_MODEL = "bge-m3"
 
-# Dossier du corpus documentaire, partagé par les deux implémentations.
-# rag.py est dans .../python/solution/ ; le corpus dans .../ressources/.
-CORPUS_DIR = Path(__file__).resolve().parents[2] / "ressources"
+# Le dossier du corpus et le chemin de la base ne sont pas définis ici : ce sont
+# des décisions de l'application, qui les passe en paramètre (voir app.py).
 
 
 # --- 1. Découpage du corpus en chunks ----------------------------------------
@@ -65,12 +64,15 @@ def _split_sections(body):
     return title, sections
 
 
-def load_chunks():
-    """Charge les documents 01→06 du corpus et les découpe en chunks."""
+def load_chunks(corpus_dir):
+    """Charge les documents 01→06 du corpus et les découpe en chunks.
+
+    corpus_dir : dossier contenant les documents Markdown du corpus.
+    """
     chunks = []
     # Le motif « 0*.md » ne sélectionne que les documents du corpus
     # (README-corpus.md et questions-test.md sont ignorés).
-    for path in sorted(CORPUS_DIR.glob("0*.md")):
+    for path in sorted(Path(corpus_dir).glob("0*.md")):
         body = _strip_frontmatter(path.read_text(encoding="utf-8"))
         title, sections = _split_sections(body)
         for heading, content in sections:
@@ -93,9 +95,9 @@ def embed_text(text):
 
 # --- 3. Indexation SQLite ----------------------------------------------------
 
-def build_index(db_path):
+def build_index(db_path, corpus_dir):
     """(Re)construit l'index SQLite à partir du corpus. Renvoie le nb de chunks."""
-    chunks = load_chunks()
+    chunks = load_chunks(corpus_dir)
     connection = sqlite3.connect(db_path)
     connection.execute("DROP TABLE IF EXISTS chunks")
     connection.execute(
@@ -119,7 +121,7 @@ def build_index(db_path):
     return len(chunks)
 
 
-def ensure_index(db_path):
+def ensure_index(db_path, corpus_dir):
     """Construit l'index seulement s'il est absent. Renvoie le nb de chunks.
 
     L'index est mis en cache sur disque (fichier SQLite) : il n'est calculé
@@ -132,7 +134,7 @@ def ensure_index(db_path):
     count = connection.execute("SELECT COUNT(*) FROM chunks").fetchone()[0] if table_exists else 0
     connection.close()
 
-    return count if count > 0 else build_index(db_path)
+    return count if count > 0 else build_index(db_path, corpus_dir)
 
 
 # --- 4. Recherche sémantique -------------------------------------------------
