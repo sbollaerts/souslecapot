@@ -61,3 +61,9 @@ tree.txt
 # Index RAG généré (labo 2) — reconstruit au démarrage à partir du corpus
 bikaroo_rag.db
 *.db
+
+# Skills créés automatiquement par le paquet Streamlit : ce sont des symlinks
+# vers l'installation Python locale, donc spécifiques à la machine et cassés
+# pour quiconque clone le dépôt.
+.agents/skills/developing-with-streamlit
+.claude/skills/developing-with-streamlit
