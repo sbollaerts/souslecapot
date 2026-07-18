@@ -1,0 +1,2 @@
+# Serveur MCP — SDK MCP officiel (inclut FastMCP et le transport Streamable HTTP).
+mcp>=1.28

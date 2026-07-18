@@ -1,0 +1,5 @@
+streamlit>=1.30
+ollama>=0.3
+# Client MCP (le SDK MCP sert aussi côté client à se connecter au serveur).
+mcp>=1.28
+# sqlite3 fait partie de la bibliothèque standard de Python (RAG, repris du labo 2).
