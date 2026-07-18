@@ -43,7 +43,7 @@ blocage ou pour comparer.
 | Élément | Rôle | Installation |
 | --- | --- | --- |
 | [Ollama](https://ollama.com/) | Exécute le LLM en local | voir la side note « Mise en place de l'environnement » du livre |
-| Modèle `mistral` | LLM utilisé (bonnes performances en français) | `ollama pull mistral` |
+| Modèle `qwen2.5:3b` | LLM utilisé (bonnes performances en français) | `ollama pull qwen2.5:3b` |
 | Python 3.10+ | Implémentation Python | — |
 | Streamlit + `ollama` (lib) | Interface et client Python | via `requirements.txt` |
 | .NET 10 SDK | Implémentation .NET | — |
@@ -55,7 +55,7 @@ Avant de lancer un des deux projets, assurez-vous qu'Ollama tourne et que le
 modèle est téléchargé :
 
 ```bash
-ollama pull mistral   # une seule fois
+ollama pull qwen2.5:3b   # une seule fois
 ollama serve          # généralement déjà lancé en tâche de fond
 ```
 
@@ -177,7 +177,7 @@ Une fois l'application fonctionnelle, jouez avec :
 
 ## 9. Résultat attendu
 
-Une application locale dans laquelle vous dialoguez avec le modèle `mistral`,
+Une application locale dans laquelle vous dialoguez avec le modèle `qwen2.5:3b`,
 modifiez le prompt système et les paramètres à la volée, voyez l'historique de la
 conversation, et disposez après chaque réponse des informations techniques de
 l'appel. Le tout sans aucune connexion à un service distant.
@@ -188,7 +188,7 @@ l'appel. Le tout sans aucune connexion à un service distant.
 
 Le labo est terminé lorsque :
 
-- [ ] l'application démarre et répond à une question via `mistral` ;
+- [ ] l'application démarre et répond à une question via `qwen2.5:3b` ;
 - [ ] modifier le prompt système change visiblement le comportement de
       l'assistant ;
 - [ ] la température et le nombre maximum de tokens ont un effet observable ;
@@ -234,9 +234,9 @@ Aide-mémoire des commandes utiles pendant le labo.
 
 ```bash
 ollama serve                 # démarrer le serveur Ollama (souvent déjà lancé)
-ollama pull mistral          # télécharger le modèle (une seule fois)
+ollama pull qwen2.5:3b          # télécharger le modèle (une seule fois)
 ollama list                  # lister les modèles installés localement
-ollama run mistral           # tester le modèle directement en ligne de commande
+ollama run qwen2.5:3b           # tester le modèle directement en ligne de commande
 ollama ps                    # voir les modèles actuellement chargés en mémoire
 ```
 

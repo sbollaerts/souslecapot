@@ -15,7 +15,7 @@ import streamlit as st
 import rag
 
 # Modèle de génération (identique au labo 1).
-MODEL = "mistral"
+MODEL = "qwen2.5:3b"
 
 # Emplacements : c'est l'application qui décide où lire le corpus et où écrire
 # l'index ; le module rag les reçoit en paramètre.

@@ -12,7 +12,7 @@ import ollama
 import streamlit as st
 
 # Modèle fixé pour ce labo (bonnes performances en français).
-MODEL = "mistral"
+MODEL = "qwen2.5:3b"
 
 # Prompt système par défaut : il positionne l'assistant, mais ne lui donne
 # volontairement aucune connaissance des documents internes de Bikaroo.

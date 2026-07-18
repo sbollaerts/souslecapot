@@ -12,7 +12,7 @@ import ollama  # client Ollama officiel — déjà installé via requirements.tx
 import streamlit as st
 
 # Modèle fixé pour ce labo (bonnes performances en français).
-MODEL = "mistral"
+MODEL = "qwen2.5:3b"
 
 # TODO (étape 1) — Prompt système par défaut.
 # Rédigez un prompt qui positionne l'assistant comme « Assistant Bikaroo »

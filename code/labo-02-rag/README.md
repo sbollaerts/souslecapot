@@ -46,7 +46,7 @@ Le dossier `solution/` contient l'implémentation complète.
 | Élément | Rôle | Installation |
 | --- | --- | --- |
 | [Ollama](https://ollama.com/) | Exécute les modèles en local | voir la side note du livre |
-| Modèle `mistral` | Génération de texte (labo 1) | `ollama pull mistral` |
+| Modèle `qwen2.5:3b` | Génération de texte (labo 1) | `ollama pull qwen2.5:3b` |
 | Modèle `bge-m3` | **Embeddings** multilingues (nouveau) | `ollama pull bge-m3` |
 | Python 3.10+ / Streamlit / `ollama` | Implémentation Python | via `requirements.txt` |
 | .NET 10 SDK / Blazor / OllamaSharp | Implémentation .NET | via le `.csproj` |
@@ -63,7 +63,7 @@ Le dossier `solution/` contient l'implémentation complète.
 Avant de lancer un projet, assurez-vous que les **deux** modèles sont présents :
 
 ```bash
-ollama pull mistral
+ollama pull qwen2.5:3b
 ollama pull bge-m3
 ```
 
@@ -166,7 +166,7 @@ En suivant les `TODO` (`rag.py` / `RagService.cs`, puis `app.py` /
 7. **Affichage des sources** — enrichir la zone d'informations techniques.
 
 Une gestion d'erreur simple signale si Ollama n'est pas lancé, si un modèle
-(`mistral`, `bge-m3`) est absent, ou si le corpus est introuvable.
+(`qwen2.5:3b`, `bge-m3`) est absent, ou si le corpus est introuvable.
 
 ---
 
@@ -246,7 +246,7 @@ Aide-mémoire des commandes utiles pendant le labo.
 
 ```bash
 ollama serve                 # démarrer le serveur Ollama (souvent déjà lancé)
-ollama pull mistral          # modèle de génération (une seule fois)
+ollama pull qwen2.5:3b          # modèle de génération (une seule fois)
 ollama pull bge-m3           # modèle d'embeddings (une seule fois)
 ollama list                  # lister les modèles installés localement
 ollama ps                    # voir les modèles chargés en mémoire
