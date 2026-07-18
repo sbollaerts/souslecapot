@@ -32,9 +32,9 @@ mcp = FastMCP("bikaroo-operations", host="127.0.0.1", port=8000)
 
 
 # Note : les descriptions des tools (docstrings) sont volontairement courtes et
-# directes. Un modèle local comme mistral choisit d'appeler un tool bien plus
-# fiablement avec une description brève et orientée action qu'avec un long
-# paragraphe. Les détails (champs renvoyés, cas d'absence) restent en commentaire.
+# directes. Un modèle local choisit d'appeler un tool bien plus fiablement avec
+# une description brève et orientée action qu'avec un long paragraphe. Les
+# détails (champs renvoyés, cas d'absence) restent en commentaire.
 
 
 @mcp.tool()

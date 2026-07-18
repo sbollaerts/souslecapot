@@ -13,9 +13,9 @@ builder.Services.AddSingleton(new OllamaApiClient(new Uri("http://localhost:1143
 
 // Modèle de génération. Ce labo demande un appel de tools fiable : on utilise
 // qwen2.5:3b, léger (~2 Go) et le plus régulier de notre comparatif pour décider
-// d'appeler un tool. Sur une machine plus confortable, « qwen2.5:7b » est encore
-// plus stable. (mistral, utilisé aux labos 1-2, n'appelle pas les tools de façon
-// fiable en présence d'un contexte RAG — voir la section « Choix techniques ».)
+// d'appeler un tool, même en présence d'un contexte RAG. Sur une machine plus
+// confortable, « qwen2.5:7b » est encore plus stable. Voir la section « Choix
+// techniques » du README.
 const string generationModel = "qwen2.5:3b";
 
 // URL du serveur MCP (à démarrer AVANT le client — voir le README).

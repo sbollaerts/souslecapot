@@ -65,16 +65,16 @@ ollama pull bge-m3       # embeddings (RAG)
 
 ### Choix techniques
 
-- **Modèle de génération : `qwen2.5:3b` (et non `mistral`).** Ce labo exige que
-  le modèle décide d'appeler un tool de façon fiable. Or `mistral` (utilisé aux
-  labos 1‑2) n'y parvient pas en présence d'un contexte RAG : il répond depuis le
-  contexte sans jamais déclencher le tool (voire décrit l'appel en texte). Un
-  comparatif sur le scénario central (5 modèles, corpus RAG chargé) a tranché :
-  `qwen2.5:3b` appelle le bon tool de façon régulière tout en n'appelant **pas**
-  de tool sur une question purement procédurale, et il est **léger** (~2 Go),
-  donc accessible à la plupart des machines. Le modèle est fixé en constante en
-  tête du client (`MODEL` dans `app.py` / `generationModel` dans `Program.cs`) :
-  vous pouvez y remettre `mistral` pour **constater vous-même** la différence.
+- **Modèle de génération : `qwen2.5:3b`.** Ce labo exige que le modèle décide
+  d'appeler un tool de façon fiable — une capacité qui varie beaucoup d'un modèle
+  local à l'autre, surtout en présence d'un contexte RAG (certains modèles
+  répondent alors depuis le contexte sans jamais déclencher le tool). Un
+  comparatif sur le scénario central (plusieurs modèles, corpus RAG chargé) a
+  tranché : `qwen2.5:3b` appelle le bon tool de façon régulière tout en
+  n'appelant **pas** de tool sur une question purement procédurale, et il est
+  **léger** (~2 Go), donc accessible à la plupart des machines. Le modèle est
+  fixé en constante en tête du client (`MODEL` dans `app.py` / `generationModel`
+  dans `Program.cs`), facile à changer pour comparer.
   - Sur une machine confortable, `qwen2.5:7b` est encore plus stable.
   - `qwen2.5:3b` est peu fiable à **température 0** (il n'appelle plus le tool) ;
     la valeur par défaut de l'interface (0,7) lui convient très bien. Évitez les

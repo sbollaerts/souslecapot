@@ -1,6 +1,6 @@
 """Client MCP de l'Assistant Bikaroo — Labo 3.
 
-Ce module relie le modèle (mistral via Ollama) au serveur MCP :
+Ce module relie le modèle (via Ollama) au serveur MCP :
 
     1. il se connecte au serveur et récupère la liste des tools ;
     2. il transmet ces tools au modèle, qui décide seul s'il en appelle un ;
