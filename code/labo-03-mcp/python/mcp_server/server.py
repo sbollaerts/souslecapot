@@ -20,10 +20,10 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-# Données synthétiques : ressources du labo, deux niveaux au-dessus de ce fichier.
-# server.py est dans .../python/solution/mcp_server/ ; les données dans
+# Données synthétiques : ressources du labo.
+# server.py est dans .../python/mcp_server/ ; les données dans
 # .../labo-03-mcp/ressources/.
-RESSOURCES_DIR = Path(__file__).resolve().parents[3] / "ressources"
+RESSOURCES_DIR = Path(__file__).resolve().parents[2] / "ressources"
 
 MEMBERS = json.loads((RESSOURCES_DIR / "members.json").read_text(encoding="utf-8"))
 TRIPS = json.loads((RESSOURCES_DIR / "trips.json").read_text(encoding="utf-8"))

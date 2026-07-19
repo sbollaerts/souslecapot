@@ -13,10 +13,10 @@ builder.Services.AddSingleton(new OllamaApiClient(new Uri("http://localhost:1143
 
 // Emplacements : c'est l'application qui décide où lire le corpus et où écrire
 // l'index ; le service RAG les reçoit en paramètre.
-// Le projet est dans .../dotnet/solution/AssistantBikaroo/ ; le corpus est
-// partagé, trois niveaux au-dessus, dans .../labo-02-rag/ressources/.
+// Le projet est dans .../dotnet/AssistantBikaroo/ ; le corpus est partagé, deux
+// niveaux au-dessus, dans .../labo-02-rag/ressources/.
 var contentRoot = builder.Environment.ContentRootPath;
-var corpusDir = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "..", "ressources"));
+var corpusDir = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "ressources"));
 var dbPath = Path.Combine(contentRoot, "bikaroo_rag.db");
 
 // Service RAG : chunking, embeddings, index SQLite et recherche sémantique.

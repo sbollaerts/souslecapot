@@ -11,17 +11,32 @@ builder.Services.AddRazorComponents()
 // Client Ollama partagé (génération + embeddings), pointant vers l'instance locale.
 builder.Services.AddSingleton(new OllamaApiClient(new Uri("http://localhost:11434")));
 
+// Modèle de génération. Ce labo demande un appel de tools fiable : on utilise
+// qwen2.5:3b, léger (~2 Go) et le plus régulier de notre comparatif pour décider
+// d'appeler un tool, même en présence d'un contexte RAG. Sur une machine plus
+// confortable, « qwen2.5:7b » est encore plus stable. Voir la section « Choix
+// techniques » du README.
+const string generationModel = "qwen2.5:3b";
+
+// URL du serveur MCP (à démarrer AVANT le client — voir le README).
+const string mcpUrl = "http://localhost:8000/mcp";
+
 // Emplacements : c'est l'application qui décide où lire le corpus et où écrire
 // l'index ; le service RAG les reçoit en paramètre.
-// Le projet est dans .../dotnet/depart/AssistantBikaroo/ ; le corpus est
-// partagé, trois niveaux au-dessus, dans .../labo-02-rag/ressources/.
+// Le projet est dans .../dotnet/AssistantBikaroo/ ; le corpus est partagé, deux
+// niveaux au-dessus, dans .../labo-03-mcp/ressources/.
 var contentRoot = builder.Environment.ContentRootPath;
-var corpusDir = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "..", "ressources"));
+var corpusDir = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "ressources"));
 var dbPath = Path.Combine(contentRoot, "bikaroo_rag.db");
 
 // Service RAG : chunking, embeddings, index SQLite et recherche sémantique.
 builder.Services.AddSingleton(sp =>
     new RagService(sp.GetRequiredService<OllamaApiClient>(), corpusDir, dbPath));
+
+// Service MCP : connexion au serveur, transmission des tools au modèle, boucle
+// d'appel de tools et réinjection des résultats.
+builder.Services.AddSingleton(sp =>
+    new McpToolService(sp.GetRequiredService<OllamaApiClient>(), mcpUrl, generationModel));
 
 var app = builder.Build();
 

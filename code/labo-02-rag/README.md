@@ -30,14 +30,11 @@ injection du contexte retrouvé dans le prompt.
 
 ## 2. Situation de départ
 
-On part de la **solution du labo 1** : le chatbot local (prompt système,
-paramètres, fil de conversation, informations techniques) fonctionne déjà. Le
-dossier `depart/` reprend cette base, avec la plomberie RAG en place (accès au
-corpus, client Ollama pour les embeddings, chemin de la base SQLite), mais **la
-logique RAG est à implémenter** — c'est le cœur de l'exercice. Des commentaires
-`TODO` guident pas à pas, ici et dans le module RAG.
-
-Le dossier `solution/` contient l'implémentation complète.
+Ce labo reprend le chatbot du labo 1 et y ajoute la chaîne RAG. Le code est
+fourni **complet et fonctionnel**, directement sous `python/` et `dotnet/` :
+ouvrez les fichiers et lisez-les en parallèle du chapitre du livre, qui explique
+le RAG au fil de la lecture (découpage du corpus, embeddings, index SQLite,
+recherche, injection du contexte). Rien à compléter.
 
 ---
 
@@ -97,7 +94,7 @@ ollama pull bge-m3
 ### Python (Streamlit)
 
 ```bash
-cd code/labo-02-rag/python/solution      # ou .../depart
+cd code/labo-02-rag/python
 python -m venv .venv
 source .venv/bin/activate                # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
@@ -110,7 +107,7 @@ embeddings). L'application s'ouvre ensuite sur <http://localhost:8501>.
 ### .NET (Blazor Server)
 
 ```bash
-cd code/labo-02-rag/dotnet/solution/AssistantBikaroo   # ou .../depart/...
+cd code/labo-02-rag/dotnet/AssistantBikaroo
 dotnet run
 ```
 
@@ -119,18 +116,17 @@ la console). Ouvrez ensuite l'URL affichée.
 
 ---
 
-## 5. Ce qui est déjà préparé dans `depart/`
+## 5. Organisation du code
 
-- La solution fonctionnelle du labo 1 (génération via Ollama).
-- La structure du module RAG (`rag.py` / `RagService.cs`) avec la plomberie :
-  accès au corpus, chemin de la base SQLite, et la fonction d'embeddings
-  (`embed_text` / `EmbedAsync`) déjà câblée sur Ollama.
-- L'interface enrichie (bascule « Avec RAG », curseur top-k).
-- Des `TODO` détaillés pour chaque étape de la chaîne RAG.
-
-**Ce qui n'est pas fourni** (l'exercice) : le découpage en chunks, l'indexation
-SQLite, la recherche par similarité cosinus, la construction du contexte, son
-injection dans le prompt et l'affichage des sources.
+- **Python** (`python/`) : `rag.py` — la chaîne RAG (découpage en chunks,
+  embeddings, index SQLite, recherche cosinus, construction du contexte) ;
+  `app.py` — l'application Streamlit (interface, bascule RAG, curseur top-k,
+  affichage des sources) ; `requirements.txt`.
+- **.NET** (`dotnet/AssistantBikaroo/`) : `RagService.cs` — la chaîne RAG ;
+  `Components/Pages/Chatbot.razor` — l'interface ; `Program.cs` — le démarrage
+  (index construit au lancement).
+- Le corpus est dans `ressources/` ; c'est l'application qui indique au module
+  RAG où le lire (paramètre `corpus_dir` / `corpusDir`).
 
 ---
 
@@ -151,8 +147,8 @@ Pas de persistance : à chaque démarrage, tout revient aux valeurs par défaut
 
 ## 7. Étapes principales
 
-En suivant les `TODO` (`rag.py` / `RagService.cs`, puis `app.py` /
-`Chatbot.razor`) :
+Les grandes étapes réalisées par le code (à suivre dans `rag.py` /
+`RagService.cs`, puis `app.py` / `Chatbot.razor`) :
 
 1. **Découpage en chunks** — lire les documents `01`→`06`, retirer le
    *frontmatter* YAML, découper sur les titres de section `##`.
@@ -231,10 +227,10 @@ peut pas faire.
 
 ## 12. Pour aller plus loin
 
-- **Poursuivre votre propre projet** : repartez de votre `solution/` complétée ;
-  elle servira de base au labo 3.
-- **Repartir proprement** : le dossier `depart/` du dépôt GitHub reste disponible
-  pour recommencer l'exercice, ou pour démarrer directement le labo 3.
+- **Poursuivre votre propre projet** : repartez du code de ce labo (`python/` ou
+  `dotnet/`) ; il sert de base au labo 3.
+- **Expérimenter librement** : ajustez la stratégie de découpage, le top-k ou le
+  prompt système — vous pouvez toujours revenir à la version du dépôt avec `git`.
 
 ---
 
@@ -256,7 +252,7 @@ curl http://localhost:11434/api/tags   # vérifier qu'Ollama répond
 ### Python (Streamlit)
 
 ```bash
-cd code/labo-02-rag/python/solution        # ou .../depart
+cd code/labo-02-rag/python
 
 python -m venv .venv                        # créer l'environnement virtuel
 source .venv/bin/activate                   # Windows : .venv\Scripts\activate
@@ -273,7 +269,7 @@ dossier de l'application, puis relancer. Arrêter l'application : `Ctrl+C`.
 ### .NET (Blazor Server)
 
 ```bash
-cd code/labo-02-rag/dotnet/solution/AssistantBikaroo   # ou .../depart/...
+cd code/labo-02-rag/dotnet/AssistantBikaroo
 
 dotnet restore                              # restaurer les paquets NuGet
 dotnet build                                # compiler

@@ -2,11 +2,11 @@ using McpServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Données synthétiques : ressources du labo, trois niveaux au-dessus du projet.
-// Le projet est dans .../dotnet/solution/McpServer/ ; les données dans
+// Données synthétiques : ressources du labo, deux niveaux au-dessus du projet.
+// Le projet est dans .../dotnet/McpServer/ ; les données dans
 // .../labo-03-mcp/ressources/.
 var ressourcesDir = Path.GetFullPath(
-    Path.Combine(builder.Environment.ContentRootPath, "..", "..", "..", "ressources"));
+    Path.Combine(builder.Environment.ContentRootPath, "..", "..", "ressources"));
 builder.Services.AddSingleton(new BikarooData(ressourcesDir));
 
 // Serveur MCP avec transport Streamable HTTP (et non stdio) : ce choix évite le

@@ -27,8 +27,8 @@ MCP_URL = "http://localhost:8000/mcp"
 
 # Emplacements : c'est l'application qui décide où lire le corpus et où écrire
 # l'index ; le module rag les reçoit en paramètre.
-# app.py est dans .../python/solution/ ; le corpus dans .../ressources/.
-CORPUS_DIR = Path(__file__).resolve().parents[2] / "ressources"
+# app.py est dans .../python/ ; le corpus dans .../ressources/.
+CORPUS_DIR = Path(__file__).resolve().parents[1] / "ressources"
 DB_PATH = Path(__file__).resolve().parent / "bikaroo_rag.db"
 
 # Prompt système : il distingue les deux sources d'information à disposition de

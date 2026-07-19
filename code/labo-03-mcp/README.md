@@ -34,14 +34,11 @@ RAG » reste, rien n'est remplacé.
 
 ## 2. Situation de départ
 
-On part de la **solution du labo 2** : le chatbot, le RAG (chunking, embeddings
-`bge-m3`, index SQLite, recherche cosinus, bascule RAG) et l'interface sont
-**déjà fonctionnels** dans `depart/` — ce n'est pas l'exercice de ce labo.
-
-Le dossier `depart/` ajoute le **squelette MCP** : un serveur avec les deux tools
-déclarés mais **non implémentés** (`TODO`), et un client dont la connexion est
-câblée mais dont la **boucle d'appel de tools reste à écrire** (`TODO`). Le
-dossier `solution/` contient tout, fonctionnel.
+Ce labo reprend le chatbot + RAG du labo 2 et y ajoute la couche MCP (serveur de
+tools + client). Le code est fourni **complet et fonctionnel**, directement sous
+`python/` et `dotnet/` : ouvrez les fichiers et lisez-les en parallèle du
+chapitre du livre, qui explique le serveur MCP, les deux tools et la boucle
+d'appel de tools. Rien à compléter.
 
 ---
 
@@ -101,14 +98,14 @@ ollama pull bge-m3       # embeddings (RAG)
 
 ```bash
 # 1) Serveur MCP (laisser tourner dans un terminal)
-cd code/labo-03-mcp/python/solution        # ou .../depart
+cd code/labo-03-mcp/python
 python -m venv .venv
 source .venv/bin/activate                  # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
 python mcp_server/server.py                # écoute sur http://localhost:8000/mcp
 
 # 2) Client (dans un SECOND terminal, même venv)
-cd code/labo-03-mcp/python/solution
+cd code/labo-03-mcp/python
 source .venv/bin/activate
 streamlit run app.py
 ```
@@ -117,11 +114,11 @@ streamlit run app.py
 
 ```bash
 # 1) Serveur MCP (laisser tourner dans un terminal)
-cd code/labo-03-mcp/dotnet/solution/McpServer      # ou .../depart/McpServer
+cd code/labo-03-mcp/dotnet/McpServer
 dotnet run                                          # écoute sur http://localhost:8000/mcp
 
 # 2) Client (dans un SECOND terminal)
-cd code/labo-03-mcp/dotnet/solution/AssistantBikaroo
+cd code/labo-03-mcp/dotnet/AssistantBikaroo
 dotnet run
 ```
 
@@ -131,30 +128,32 @@ la dépendance du serveur (`mcp`).
 
 ---
 
-## 5. Ce qui est déjà préparé dans `depart/`
+## 5. Organisation du code
 
-- **Tout le labo 2** : chatbot, RAG complet, interface, zone d'informations
-  techniques (chunks/sources). Fonctionnel, pas de `TODO` dessus.
-- Le **squelette du serveur MCP** : serveur FastMCP / ASP.NET Core qui démarre,
-  charge `members.json` et `trips.json`, et déclare les deux tools — dont le
-  **corps est à écrire**.
-- La **connexion client MCP** câblée (liste des tools au démarrage) et les aides
-  (conversion du schéma, appel au modèle) — la **boucle d'appel de tools** est à
-  écrire.
+Chaque implémentation comprend **deux sous-projets** : le serveur MCP et le
+client (l'Assistant Bikaroo).
 
-**Ce qui n'est pas fourni** (l'exercice) : le corps des deux tools côté serveur,
-et côté client la boucle « le modèle demande un tool → on l'exécute → on
-réinjecte le résultat → le modèle répond », plus l'affichage des appels de tools.
+- **Python** (`python/`) : `mcp_server/server.py` — le serveur MCP (FastMCP) et
+  les deux tools ; `mcp_client.py` — la connexion au serveur et la boucle d'appel
+  de tools ; `app.py` — l'application Streamlit ; `rag.py` — la chaîne RAG (labo
+  2). Les dépendances : `requirements.txt` (client) et `mcp_server/requirements.txt`.
+- **.NET** (`dotnet/`) : `McpServer/` — le serveur MCP (ASP.NET Core :
+  `BikarooData.cs`, `BikarooTools.cs`, `Program.cs`) ; `AssistantBikaroo/` — le
+  client Blazor, dont `McpToolService.cs` (connexion + boucle d'appel de tools)
+  et `RagService.cs` (RAG).
+- Les données (`members.json`, `trips.json`) et le corpus sont dans `ressources/`.
 
 ---
 
-## 6. Ce que vous allez construire
+## 6. Ce que le labo ajoute
+
+Par rapport au labo 2, le code ajoute :
 
 1. **Deux tools MCP** : `get_member(member_id)` et `get_trip_status(trip_id)`,
    qui lisent les données synthétiques et renvoient un résultat (ou une absence
    de résultat si l'identifiant est inconnu).
-2. **La boucle client** : transmettre les tools au modèle, exécuter l'appel qu'il
-   demande, réinjecter le résultat, laisser le modèle conclure.
+2. **La boucle client** : le client transmet les tools au modèle, exécute l'appel
+   qu'il demande, réinjecte le résultat, puis laisse le modèle conclure.
 3. **La zone d'appels de tools** dans l'interface : pour chaque appel, le nom du
    tool, les paramètres et le résultat — dans le prolongement de la zone
    d'informations techniques du labo 2.
@@ -163,18 +162,19 @@ réinjecte le résultat → le modèle répond », plus l'affichage des appels d
 
 ## 7. Étapes principales
 
-1. **Serveur MCP** — implémenter le corps de `get_member` et `get_trip_status`
-   (recherche dans les données chargées ; absence de résultat si inconnu).
-   Garder des **descriptions de tools courtes** (un modèle local les appelle plus
-   fiablement).
-2. **Client — liste des tools** : la connexion et la récupération des tools sont
-   déjà câblées ; les convertir au format attendu par le modèle.
-3. **Client — boucle d'appel** : appeler le modèle avec les tools ; tant qu'il
-   renvoie un appel, l'exécuter, journaliser (nom, paramètres, résultat) et
-   réinjecter le résultat (rôle `tool`) ; sinon, renvoyer la réponse finale.
-4. **Repli** : si le serveur MCP n'est pas joignable, répondre sans tools et le
-   signaler clairement.
-5. **Interface** : afficher les appels de tools sous la réponse.
+Les grandes étapes réalisées par le code :
+
+1. **Serveur MCP** — `get_member` et `get_trip_status` recherchent dans les
+   données chargées (absence de résultat si inconnu). Leurs descriptions sont
+   volontairement **courtes** (un modèle local les appelle plus fiablement).
+2. **Client — liste des tools** : le client se connecte au serveur, récupère les
+   tools et les convertit au format attendu par le modèle.
+3. **Client — boucle d'appel** : le modèle est appelé avec les tools ; tant qu'il
+   renvoie un appel, il est exécuté, journalisé (nom, paramètres, résultat) et le
+   résultat est réinjecté (rôle `tool`) ; sinon, la réponse finale est renvoyée.
+4. **Repli** : si le serveur MCP n'est pas joignable, la réponse est produite
+   sans tools et cela est signalé clairement.
+5. **Interface** : les appels de tools sont affichés sous la réponse.
 
 ---
 
@@ -238,10 +238,11 @@ processus complet plutôt que de laisser le modèle improviser appel par appel.
 
 ## 12. Pour aller plus loin
 
-- **Poursuivre votre propre projet** : repartez de votre `solution/` complétée ;
-  elle servira de base au labo 4.
-- **Repartir proprement** : le dossier `depart/` du dépôt GitHub reste disponible
-  pour recommencer l'exercice, ou pour démarrer directement le labo 4.
+- **Poursuivre votre propre projet** : repartez du code de ce labo (`python/` ou
+  `dotnet/`) ; il sert de base au labo 4.
+- **Expérimenter librement** : ajoutez un tool, modifiez les données de
+  `ressources/` ou le prompt système — vous pouvez toujours revenir à la version
+  du dépôt avec `git`.
 
 ---
 
@@ -263,11 +264,11 @@ curl http://localhost:11434/api/tags   # vérifier qu'Ollama répond
 
 ```bash
 # Python
-cd code/labo-03-mcp/python/solution        # ou .../depart
+cd code/labo-03-mcp/python
 python mcp_server/server.py                # http://localhost:8000/mcp
 
 # .NET
-cd code/labo-03-mcp/dotnet/solution/McpServer   # ou .../depart/McpServer
+cd code/labo-03-mcp/dotnet/McpServer
 dotnet run                                       # http://localhost:8000/mcp
 
 # Vérifier que l'endpoint MCP répond (poignée de main « initialize ») :
@@ -284,7 +285,7 @@ Arrêter le serveur : `Ctrl+C`.
 ### Client Python (Streamlit)
 
 ```bash
-cd code/labo-03-mcp/python/solution        # ou .../depart
+cd code/labo-03-mcp/python
 python -m venv .venv
 source .venv/bin/activate                  # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
@@ -294,7 +295,7 @@ streamlit run app.py
 ### Client .NET (Blazor Server)
 
 ```bash
-cd code/labo-03-mcp/dotnet/solution/AssistantBikaroo   # ou .../depart/...
+cd code/labo-03-mcp/dotnet/AssistantBikaroo
 dotnet run
 ```
 

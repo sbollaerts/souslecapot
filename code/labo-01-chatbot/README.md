@@ -27,14 +27,10 @@ avant d'enrichir l'assistant dans les labos suivants.
 
 ## 2. Situation de départ
 
-Vous partez d'un squelette fonctionnel (dossier `depart/`) : l'interface et la
-connexion au client Ollama sont déjà en place, mais **le cœur de l'exercice
-n'est pas implémenté** — construction du prompt système, historique de
-conversation, appel au modèle et prise en compte des paramètres. Des commentaires
-`TODO` vous guident pas à pas.
-
-Le dossier `solution/` contient l'implémentation complète, à consulter en cas de
-blocage ou pour comparer.
+Le code est fourni **complet et fonctionnel**, directement sous `python/` et
+`dotnet/`. Vous n'avez rien à compléter : ouvrez les fichiers et lisez-les en
+parallèle du chapitre du livre, qui explique le code au fil de la lecture. Ce
+premier labo part de zéro (pas de code des labos précédents à reprendre).
 
 ---
 
@@ -76,7 +72,7 @@ ollama serve          # généralement déjà lancé en tâche de fond
 ### Python (Streamlit)
 
 ```bash
-cd code/labo-01-chatbot/python/solution   # ou .../depart pour partir du squelette
+cd code/labo-01-chatbot/python
 python -m venv .venv
 source .venv/bin/activate                 # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
@@ -89,7 +85,7 @@ Streamlit ouvre l'application dans le navigateur (par défaut
 ### .NET (Blazor Server)
 
 ```bash
-cd code/labo-01-chatbot/dotnet/solution/AssistantBikaroo   # ou .../depart/...
+cd code/labo-01-chatbot/dotnet/AssistantBikaroo
 dotnet run
 ```
 
@@ -98,19 +94,14 @@ Ouvrez ensuite l'URL affichée dans la console (par défaut
 
 ---
 
-## 5. Ce qui est déjà préparé dans `depart/`
+## 5. Organisation du code
 
-- Un projet fonctionnel qui **démarre** (dépendances déclarées, interface qui
-  s'affiche).
-- La structure de fichiers et l'ossature de l'interface (zone de prompt système,
-  paramètres, fil de conversation, bouton « Effacer »).
-- La connexion au client Ollama (import Python / injection du client .NET).
-- Des commentaires `TODO` indiquant précisément ce qu'il reste à écrire.
-
-**Ce qui n'est pas fourni** (c'est l'exercice) : la rédaction du prompt système
-par défaut, la construction de la liste de messages (système + historique),
-l'appel effectif au modèle avec les paramètres, et l'affichage des informations
-techniques.
+- **Python** (`python/`) : `app.py` — l'application Streamlit complète (prompt
+  système, paramètres, fil de conversation, appel Ollama, informations
+  techniques) ; `requirements.txt` — les dépendances.
+- **.NET** (`dotnet/AssistantBikaroo/`) : projet Blazor Server — `Program.cs`
+  (démarrage et injection du client Ollama) et `Components/Pages/Chatbot.razor`
+  (toute l'interface et l'appel au modèle).
 
 ---
 
@@ -135,19 +126,19 @@ reviennent à leurs valeurs par défaut.
 
 ## 7. Étapes principales
 
-En suivant les `TODO` du fichier principal (`app.py` en Python,
+Les grandes étapes réalisées par le code (à suivre dans `app.py` en Python,
 `Components/Pages/Chatbot.razor` en .NET) :
 
-1. **Prompt système par défaut** — définir un texte positionnant l'assistant
-   comme « Assistant Bikaroo », sans connaissance documentaire.
-2. **Contrôles de configuration** — exposer le prompt système (éditable) et les
-   curseurs de température et de nombre maximum de tokens.
-3. **Appel au modèle** — construire la liste de messages (prompt système +
-   historique), appeler Ollama avec les paramètres, mesurer la durée, ajouter la
-   réponse à l'historique.
-4. **Informations techniques** — afficher modèle, paramètres et durée du dernier
-   appel.
-5. **Bouton « Effacer »** — vider la conversation en conservant le prompt système.
+1. **Prompt système par défaut** — un texte qui positionne l'assistant comme
+   « Assistant Bikaroo », sans connaissance documentaire.
+2. **Contrôles de configuration** — le prompt système (éditable) et les curseurs
+   de température et de nombre maximum de tokens.
+3. **Appel au modèle** — construction de la liste de messages (prompt système +
+   historique), appel à Ollama avec les paramètres, mesure de la durée, ajout de
+   la réponse à l'historique.
+4. **Informations techniques** — affichage du modèle, des paramètres et de la
+   durée du dernier appel.
+5. **Bouton « Effacer »** — vide la conversation en conservant le prompt système.
 
 Une gestion d'erreur simple est prévue : si Ollama n'est pas lancé ou si le
 modèle est absent, un message clair s'affiche.
@@ -218,11 +209,10 @@ des sources réelles.
 
 ## 12. Pour aller plus loin
 
-- **Poursuivre votre propre projet** : repartez de votre `solution/` complétée ;
-  elle servira de base au labo 2.
-- **Repartir proprement** : le dossier `depart/` du dépôt GitHub reste disponible
-  pour recommencer l'exercice à zéro, ou pour démarrer directement le labo 2 sur
-  une base saine.
+- **Poursuivre votre propre projet** : repartez du code de ce labo (`python/` ou
+  `dotnet/`) ; il sert de base au labo 2.
+- **Expérimenter librement** : modifiez le code, le prompt système ou les
+  paramètres — vous pouvez toujours revenir à la version du dépôt avec `git`.
 
 ---
 
@@ -249,7 +239,7 @@ curl http://localhost:11434/api/tags
 ### Python (Streamlit)
 
 ```bash
-cd code/labo-01-chatbot/python/solution   # ou .../depart
+cd code/labo-01-chatbot/python
 
 python -m venv .venv                       # créer l'environnement virtuel
 source .venv/bin/activate                  # Windows : .venv\Scripts\activate
@@ -265,7 +255,7 @@ Arrêter l'application : `Ctrl+C` dans le terminal.
 ### .NET (Blazor Server)
 
 ```bash
-cd code/labo-01-chatbot/dotnet/solution/AssistantBikaroo   # ou .../depart/...
+cd code/labo-01-chatbot/dotnet/AssistantBikaroo
 
 dotnet restore                             # restaurer les paquets NuGet
 dotnet build                               # compiler
