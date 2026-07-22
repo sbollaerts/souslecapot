@@ -1,0 +1,323 @@
+@page "/"
+@rendermode InteractiveServer
+@using OllamaSharp.Models
+@using OllamaSharp.Models.Chat
+@inject RagService Rag
+@inject McpToolService Mcp
+@inject OrchestrationService Orch
+
+<PageTitle>Assistant Bikaroo — Labo 4</PageTitle>
+
+<div style="display:flex; gap:2rem; max-width:1100px; margin:1rem auto; font-family:sans-serif;">
+
+    @* --- Colonne configuration --- *@
+    <aside style="width:340px; flex-shrink:0;">
+        <h2>Configuration</h2>
+
+        <label><strong>Membre connecté (identifiant)</strong></label>
+        <input @bind="memberId" style="width:100%;" />
+        <p style="color:#666; font-size:0.8rem;">Pas d'authentification réelle dans ce
+            labo : le membre est simplement pré-configuré ici.</p>
+
+        <label>
+            <input type="checkbox" @bind="useRag" />
+            <strong>Avec RAG (hors processus)</strong>
+        </label>
+
+        <label style="margin-top:0.5rem; display:block;"><strong>Prompt système (hors processus)</strong></label>
+        <textarea @bind="systemPrompt" rows="6" style="width:100%;"></textarea>
+
+        <h3>Paramètres de génération</h3>
+        <label>Température : @temperature.ToString("0.0")</label>
+        <input type="range" min="0" max="1" step="0.1" @bind="temperature" style="width:100%;" />
+        <label>Nombre maximum de tokens en sortie : @maxTokens</label>
+        <input type="range" min="64" max="2048" step="64" @bind="maxTokens" style="width:100%;" />
+        <label>Nombre de chunks récupérés (top-k) : @topK</label>
+        <input type="range" min="1" max="6" step="1" @bind="topK" style="width:100%;" />
+
+        <h3>Serveur MCP</h3>
+        @if (mcpTools is not null)
+        {
+            <p style="color:#137333; font-size:0.85rem;">Connecté · tools : @string.Join(", ", mcpTools)</p>
+        }
+        else
+        {
+            <p style="color:#b06000; font-size:0.85rem;">Serveur MCP injoignable. Démarrez-le, puis rechargez.</p>
+        }
+
+        <button @onclick="ClearConversation" style="margin-top:1rem;">Effacer la conversation</button>
+    </aside>
+
+    @* --- Colonne conversation --- *@
+    <main style="flex-grow:1;">
+        <h1>🚲 Assistant Bikaroo</h1>
+        <p><em>Labo 4 — Orchestration (Ollama · @Mcp.Model + @RagService.EmbeddingModel ·
+            @Rag.IndexSize chunks · serveur MCP)</em></p>
+
+        @if (process is not null && process.Active)
+        {
+            <p style="background:#e8f0fe; padding:0.5rem 0.75rem; border-radius:6px;">
+                <strong>Processus de révision — Étape @process.Step/5 :
+                @OrchestrationService.StepLabels[process.Step]</strong>
+            </p>
+        }
+
+        <div style="border:1px solid #ccc; padding:1rem; min-height:200px; margin-bottom:1rem;">
+            @if (messages.Count == 0)
+            {
+                <p style="color:#888;">La conversation est vide. Posez une question ou décrivez votre demande.</p>
+            }
+            @foreach (var message in messages)
+            {
+                <p><strong>@(message.Role == "user" ? "Vous" : "Assistant") :</strong> @message.Content</p>
+            }
+        </div>
+
+        @if (errorMessage is not null)
+        {
+            <p style="color:#b00020;">@errorMessage</p>
+        }
+
+        <div style="display:flex; gap:0.5rem;">
+            <input @bind="userInput" @bind:event="oninput" @onkeydown="OnKeyDown"
+                   placeholder="Posez votre question ou décrivez votre demande…"
+                   style="flex-grow:1;" disabled="@isGenerating" />
+            <button @onclick="SendAsync" disabled="@(isGenerating || string.IsNullOrWhiteSpace(userInput))">
+                @(isGenerating ? "…" : "Envoyer")
+            </button>
+        </div>
+
+        @* Boutons de confirmation — étape 4 uniquement. Aucune écriture sans clic explicite. *@
+        @if (process is not null && process.Active && process.NeedConfirmation)
+        {
+            <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
+                <button @onclick="ConfirmAsync" disabled="@isGenerating"
+                        style="flex:1; background:#137333; color:white; padding:0.5rem;">✅ Confirmer</button>
+                <button @onclick="CancelProcess" disabled="@isGenerating"
+                        style="flex:1; padding:0.5rem;">✖ Annuler</button>
+            </div>
+        }
+
+        @if (lastCallInfo is not null)
+        {
+            <details open style="margin-top:1rem;">
+                <summary>Informations techniques sur le dernier appel</summary>
+                <ul>
+                    @foreach (var item in lastCallInfo)
+                    {
+                        <li><strong>@item.Key :</strong> @item.Value</li>
+                    }
+                </ul>
+
+                @if (lastToolCalls is not null && lastToolCalls.Count > 0)
+                {
+                    <p style="margin-bottom:0.25rem;"><strong>Appels de tools :</strong></p>
+                    <ul>
+                        @foreach (var call in lastToolCalls)
+                        {
+                            <li>
+                                <code>@call.Name</code> — paramètres : <code>@call.Arguments</code>
+                                <blockquote style="color:#555; margin:0.25rem 0 0.5rem;">@Excerpt(call.Result, 300)</blockquote>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                @if (lastSources is not null && lastSources.Count > 0)
+                {
+                    <p style="margin-bottom:0.25rem;"><strong>Sources retrouvées (RAG) :</strong></p>
+                    <ul>
+                        @foreach (var source in lastSources)
+                        {
+                            <li>
+                                <code>@source.Score.ToString("0.000")</code> —
+                                <strong>@source.Document</strong> (@source.Heading)
+                                <blockquote style="color:#555; margin:0.25rem 0 0.5rem;">@Excerpt(source.Content, 200)</blockquote>
+                            </li>
+                        }
+                    </ul>
+                }
+            </details>
+        }
+    </main>
+</div>
+
+@code {
+    private string memberId = "MBR-1042";
+    private bool useRag = true;
+    private double temperature = 0.7;
+    private int maxTokens = 512;
+    private int topK = 4;
+
+    private string systemPrompt =
+        "Tu es l'Assistant Bikaroo, l'assistant virtuel de Bikaroo, une société de "
+        + "vélos partagés à Bruxelles. Tu réponds toujours en français, de manière claire, "
+        + "polie et concise. Tu disposes d'un contexte documentaire et de tools de lecture "
+        + "(statut d'un trajet, informations d'un membre). Appuie-toi dessus et n'invente pas.";
+
+    private string userInput = string.Empty;
+    private bool isGenerating;
+    private string? errorMessage;
+
+    private readonly List<ChatMessage> messages = new();
+    private RevisionProcess? process;
+    private Dictionary<string, string>? lastCallInfo;
+    private List<Chunk>? lastSources;
+    private List<ToolCallLog>? lastToolCalls;
+    private List<string>? mcpTools;
+
+    private record ChatMessage(string Role, string Content);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            mcpTools = await Mcp.ListToolNamesAsync();
+        }
+        catch
+        {
+            mcpTools = null;
+        }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendAsync();
+        }
+    }
+
+    private async Task SendAsync()
+    {
+        if (string.IsNullOrWhiteSpace(userInput) || isGenerating)
+        {
+            return;
+        }
+
+        errorMessage = null;
+        messages.Add(new ChatMessage("user", userInput));
+        var question = userInput;
+        userInput = string.Empty;
+        isGenerating = true;
+
+        try
+        {
+            string answer;
+            if (process is not null && process.Active)
+            {
+                // Un processus est en cours : l'orchestration pilote (déterministe).
+                answer = await Orch.HandleMessageAsync(process, question);
+                lastCallInfo = new() { ["Contexte"] = "Processus de révision" };
+            }
+            else if (mcpTools is not null && await Orch.DetectRevisionIntentAsync(question))
+            {
+                // Intention de contestation détectée : démarrage du processus.
+                process = OrchestrationService.NewProcess(memberId);
+                process.TripId = OrchestrationService.FindTripId(question);
+                answer = await Orch.AdvanceAfterStartAsync(process);
+                lastCallInfo = new() { ["Contexte"] = "Processus de révision (démarrage)" };
+            }
+            else
+            {
+                // Hors processus : comportement du labo 3 (chat + RAG + tools de lecture).
+                var context = string.Empty;
+                lastSources = null;
+                if (useRag)
+                {
+                    lastSources = await Rag.SearchAsync(question, topK);
+                    context = RagService.BuildContext(lastSources);
+                }
+                var chatMessages = new List<Message>
+                {
+                    new() { Role = ChatRole.System, Content = systemPrompt },
+                };
+                if (context.Length > 0)
+                {
+                    chatMessages.Add(new Message { Role = ChatRole.System,
+                        Content = "Contexte documentaire :\n\n" + context });
+                }
+                foreach (var m in messages)
+                {
+                    chatMessages.Add(new Message
+                    {
+                        Role = m.Role == "user" ? ChatRole.User : ChatRole.Assistant,
+                        Content = m.Content,
+                    });
+                }
+                var options = new RequestOptions { Temperature = (float)temperature, NumPredict = maxTokens };
+                var result = await Mcp.AnswerAsync(chatMessages, options);
+                answer = result.Text;
+                lastToolCalls = result.ToolCalls;
+                lastCallInfo = new()
+                {
+                    ["Contexte"] = "Chat libre",
+                    ["Mode"] = useRag ? "Avec RAG" : "Sans RAG",
+                    ["Serveur MCP"] = result.McpAvailable ? "connecté" : "injoignable",
+                    ["Tools appelés"] = result.ToolCalls.Count.ToString(),
+                };
+            }
+            messages.Add(new ChatMessage("assistant", answer));
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Une erreur est survenue (Ollama, serveur MCP ou base indisponible). "
+                + $"Détail : {ex.Message}";
+        }
+        finally
+        {
+            isGenerating = false;
+        }
+    }
+
+    private async Task ConfirmAsync()
+    {
+        if (process is null || isGenerating)
+        {
+            return;
+        }
+        isGenerating = true;
+        try
+        {
+            var message = await Orch.ConfirmAsync(process);
+            messages.Add(new ChatMessage("assistant", message));
+            lastToolCalls = process.LastToolCall is null
+                ? null : new List<ToolCallLog> { process.LastToolCall };
+            lastCallInfo = new() { ["Contexte"] = "Processus de révision — création confirmée" };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Impossible de créer la demande. Détail : {ex.Message}";
+        }
+        finally
+        {
+            isGenerating = false;
+        }
+    }
+
+    private void CancelProcess()
+    {
+        if (process is null)
+        {
+            return;
+        }
+        var message = Orch.Cancel(process);
+        messages.Add(new ChatMessage("assistant", message));
+    }
+
+    private void ClearConversation()
+    {
+        messages.Clear();
+        process = null;
+        lastCallInfo = null;
+        lastSources = null;
+        lastToolCalls = null;
+        errorMessage = null;
+    }
+
+    private static string Excerpt(string content, int max)
+    {
+        var text = content.Replace("\n", " ");
+        return text.Length > max ? text[..max] + "…" : text;
+    }
+}
