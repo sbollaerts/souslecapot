@@ -1,0 +1,2 @@
+# Serveur MCP — SDK MCP officiel (FastMCP + Streamable HTTP). sqlite3 est standard.
+mcp>=1.28

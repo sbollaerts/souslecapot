@@ -1,0 +1,32 @@
+[
+  {
+    "trip_id": "TRP-88231",
+    "member_id": "MBR-1042",
+    "bike_id": "BIK-2841",
+    "start_time": "2026-07-15T07:12:00",
+    "end_time": null,
+    "status": "open",
+    "location_start": "Station Flagey",
+    "location_end_reported": "Station Sainte-Catherine"
+  },
+  {
+    "trip_id": "TRP-88190",
+    "member_id": "MBR-1042",
+    "bike_id": "BIK-1055",
+    "start_time": "2026-07-10T18:03:00",
+    "end_time": "2026-07-10T18:41:00",
+    "status": "closed",
+    "location_start": "Station Sainte-Catherine",
+    "location_end_reported": "Station Flagey"
+  },
+  {
+    "trip_id": "TRP-90044",
+    "member_id": "MBR-2077",
+    "bike_id": "BIK-0932",
+    "start_time": "2026-07-14T08:20:00",
+    "end_time": "2026-07-14T08:47:00",
+    "status": "closed",
+    "location_start": "Station Flagey",
+    "location_end_reported": "Station Merode"
+  }
+]
