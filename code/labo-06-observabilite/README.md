@@ -27,7 +27,7 @@ Principe central :
 
 ---
 
-## 2. Contexte hérité du labo 5
+## 2. Ce que fait le code fourni
 
 Tout est repris : chat local (`qwen2.5:3b`), RAG (`bge-m3`), serveur et client
 MCP, tools de lecture et d'écriture, workflow en 5 étapes, `TrustedContext`,
@@ -276,7 +276,11 @@ chronologie et les métriques. **Elle ne modifie jamais le résultat métier.**
 
 ---
 
-## 16. Commandes Python
+## 16. Restauration et lancement depuis un clone propre
+
+> **Important : démarrez le serveur MCP AVANT le client.**
+
+### Python (Streamlit)
 
 ```bash
 cd code/labo-06-observabilite/python
@@ -289,7 +293,7 @@ python mcp_server/server.py          # http://localhost:8000/mcp
 streamlit run app.py
 ```
 
-## 17. Commandes .NET
+### .NET (Blazor Server)
 
 ```bash
 cd code/labo-06-observabilite/dotnet/McpServer
@@ -310,7 +314,7 @@ ollama list
 
 ---
 
-## 18. Scénarios de diagnostic
+## 17. Expérimentations proposées
 
 Résultats mesurés, identiques sur les deux stacks (mode protégé).
 
@@ -331,7 +335,7 @@ remonte la fixture d'injection.
 
 ---
 
-## 19. Limites volontaires
+## 18. Limites volontaires
 
 - **Traces en mémoire de session uniquement** : rien n'est persisté côté serveur.
 - **Nombre limité** de traces conservées (`MAX_TRACES = 20`).
@@ -352,7 +356,7 @@ OpenTelemetry · Jaeger · Grafana · Prometheus · Elastic · Application Insig
 
 ---
 
-## 20. Conclusion des six laboratoires
+## 19. Conclusion des six laboratoires
 
 ```text
 Labo 1 → converser

@@ -28,7 +28,7 @@ Deux modes permettent la comparaison directe : **vulnérable** et **protégé**.
 
 ---
 
-## 2. Contexte hérité du labo 4
+## 2. Ce que fait le code fourni
 
 Tout le labo 4 est repris : chat local (`qwen2.5:3b`), RAG (`bge-m3`, corpus
 Markdown), serveur et client MCP, tools de lecture `get_member` /
@@ -173,7 +173,7 @@ Le comportement des trajets nominaux (`TRP-88231`, `TRP-88190`, `TRP-90044`) est
 
 ---
 
-## 9. Structure des fichiers
+## 9. Organisation du code
 
 ```text
 code/labo-05-securite/
@@ -201,7 +201,11 @@ code/labo-05-securite/
 
 ---
 
-## 10. Commandes Python
+## 10. Restauration et lancement depuis un clone propre
+
+> **Important : démarrez le serveur MCP AVANT le client.**
+
+### Python (Streamlit)
 
 ```bash
 # Serveur MCP (laisser tourner)
@@ -217,7 +221,7 @@ source .venv/bin/activate
 streamlit run app.py
 ```
 
-## 11. Commandes .NET
+### .NET (Blazor Server)
 
 ```bash
 # Serveur MCP
@@ -239,7 +243,7 @@ ollama list
 
 ---
 
-## 12. Scénarios de test
+## 11. Expérimentations proposées
 
 Résultats obtenus sur les deux stacks (Python et .NET, comportement identique).
 
@@ -261,7 +265,7 @@ demande. »
 
 ---
 
-## 13. Événements de sécurité
+## 12. Événements de sécurité
 
 Chaque événement porte : horodatage, type, gravité, source, détails, action
 (`REFUSED` / `DETECTED` / `IGNORED` / `ALLOWED`).
@@ -278,7 +282,7 @@ permet de comparer la même attaque dans les deux modes.
 
 ---
 
-## 14. Limites volontaires
+## 13. Limites volontaires
 
 - **La détection par motifs n'est pas une protection.** Elle est contournable
   trivialement (reformulation, autre langue, encodage). Elle sert à *rendre
@@ -294,7 +298,7 @@ permet de comparer la même attaque dans les deux modes.
 
 ---
 
-## 15. Transition vers le labo 6
+## 14. La limite révélée par ce labo
 
 > Le système refuse désormais plusieurs actions dangereuses, mais il faut encore
 > pouvoir **expliquer précisément** ce qui s'est passé : à quelle étape, avec

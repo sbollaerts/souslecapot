@@ -110,7 +110,7 @@ Git** (`.gitignore`).
 
 ---
 
-## 6. Ce que fait fonctionnellement l'application — le scénario en 5 étapes
+## 6. Ce que le labo ajoute — le scénario en 5 étapes
 
 Stéphane (`MBR-1042`) constate que son trajet du matin (`TRP-88231`, resté
 ouvert) va lui occasionner des frais indus et veut contester. L'assistant le guide :
@@ -211,7 +211,7 @@ non fiables, contrôle d'identité) et renforcera l'assistant en conséquence.
 
 ---
 
-## 12. Choix techniques qui s'écartent d'une solution idéale
+## 12. Limites volontaires
 
 - **SQLite pour les demandes de révision.** Comme pour l'index RAG au labo 2, on
   reste sur SQLite : simple, sans service supplémentaire. Une vraie application
