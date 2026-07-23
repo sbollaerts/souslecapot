@@ -25,7 +25,7 @@ avant d'enrichir l'assistant dans les labos suivants.
 
 ---
 
-## 2. Situation de départ
+## 2. Ce que fait le code fourni
 
 Le code est fourni **complet et fonctionnel**, directement sous `python/` et
 `dotnet/`. Vous n'avez rien à compléter : ouvrez les fichiers et lisez-les en
@@ -105,7 +105,7 @@ Ouvrez ensuite l'URL affichée dans la console (par défaut
 
 ---
 
-## 6. Ce que vous allez construire
+## 6. Ce que fait l'application
 
 Un chatbot local minimal comprenant :
 

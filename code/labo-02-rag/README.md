@@ -28,7 +28,7 @@ injection du contexte retrouvé dans le prompt.
 
 ---
 
-## 2. Situation de départ
+## 2. Ce que fait le code fourni
 
 Ce labo reprend le chatbot du labo 1 et y ajoute la chaîne RAG. Le code est
 fourni **complet et fonctionnel**, directement sous `python/` et `dotnet/` :
@@ -130,7 +130,7 @@ la console). Ouvrez ensuite l'URL affichée.
 
 ---
 
-## 6. Ce que vous allez construire
+## 6. Ce que le labo ajoute
 
 L'interface du labo 1, augmentée de :
 

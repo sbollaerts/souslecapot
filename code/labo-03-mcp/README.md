@@ -32,7 +32,7 @@ RAG » reste, rien n'est remplacé.
 
 ---
 
-## 2. Situation de départ
+## 2. Ce que fait le code fourni
 
 Ce labo reprend le chatbot + RAG du labo 2 et y ajoute la couche MCP (serveur de
 tools + client). Le code est fourni **complet et fonctionnel**, directement sous
